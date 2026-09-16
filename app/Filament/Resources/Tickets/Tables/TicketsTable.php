@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Tickets\Tables;
 
+use App\Models\Ticket;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -9,6 +10,10 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
+use Filament\Support\Icons\Heroicon;
+use Filament\Notifications\Notification;
 
 class TicketsTable
 {
@@ -123,6 +128,74 @@ class TicketsTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                Action::make('marcarResuelto')
+                ->label('Resolver')
+                ->icon(Heroicon::CheckCircle)
+                ->color('success')
+                ->requiresConfirmation()
+                ->modalHeading('¿Marcar ticket como resuelto?')
+                ->modalDescription('Esta acción actualizará el estado a Resuelto y registrara la fecha actual.')
+                ->visible( fn (Ticket $record): bool => !in_array($record->estatus, ['resuelto', 'cerrado']))
+                ->action(function (Ticket $record) {
+                    $record->update([
+                        'estatus' => 'resuelto',
+                        'resuelto_en' => now()
+                    ]);
+
+                    Notification::make()
+                        ->title('Ticket Resuelto')
+                        ->success()
+                        ->send();
+                }),
+
+                Action::make('reasignar')
+                ->label('Asignar')
+                ->icon(Heroicon::UserPlus)
+                ->color('info')
+                ->schema([
+                    Select::make('asignado_a')
+                    ->label('Seleccionar Agente')
+                    ->relationship('agenteAsignado', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                ])
+                ->action(function(Ticket $record, array $data){
+                    $record->update([
+                        'asignado_a' =>$data['asignado_a'],
+                        'estatus' => $record->estatus === 'abierto' ? 'en_progreso' : $record->estatus,
+                    ]);
+
+                    Notification::make()
+                    ->title('Agente Asignado')
+                    ->info()
+                    ->send();
+                }),
+
+                Action::make('cambiarPrioridad')
+                ->label('Nueva Prioridad')
+                ->icon(Heroicon::ExclamationTriangle)
+                ->color('warning')
+                ->schema([
+                    Select::make('prioridad')
+                    ->label('Nueva Prioridad')
+                    ->options([
+                        'baja' => 'Baja',
+                        'media' => 'Media',
+                        'alta' => 'Alta',
+                        'critica' => 'Critica',
+                    ])
+                    ->required(),
+                ])
+                ->action(function (Ticket $record, array $data) {
+                    $record->update([
+                        'prioridad' => $data['prioridad']
+                    ]);
+                    Notification::make()
+                        ->title('Prioridad Actualizada')
+                        ->warning()
+                        ->send();
+                })
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
