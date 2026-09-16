@@ -1,0 +1,85 @@
+//tipos de usuarios: Clientes, Agentes de Soporte, Administradores
+//clasificacion del ticket: Categorias o Departamentos (Ventas, Operaciones, TI, etc...)
+//1. Modelo de Datos y Estructura de la Base de Datos
+Las entidades principales que debes crear en Laravel son:
+
+Users: Usuarios del sistema (Clientes, Agentes de Soporte, Administradores).
+
+Categories / Departments: Clasificación del ticket (ej. Soporte Técnico, Facturación, Ventas).
+
+Tickets: Tabla central que contiene:
+
+ticket_number (código único ej. #TK-1002).
+
+subject (asunto).
+
+description (descripción inicial).
+
+status (Abierto, En Proceso, Esperando Respuesta, Resuelto, Cerrado).
+
+priority (Baja, Media, Alta, Crítica).
+
+user_id (cliente que abrió el ticket).
+
+assigned_to (agente/usuario asignado).
+
+category_id (departamento).
+
+TicketReplies (Respuestas): Historial del hilo de conversación:
+
+ticket_id, user_id, content.
+
+is_internal_note (booleano para definir si es una nota privada solo entre agentes/administradores).
+
+Attachments: Archivos o capturas de pantalla adjuntos a un ticket o respuesta.
+
+CannedResponses (Respuestas Rápidas): Plantillas de texto predefinidas ("Gracias por comunicarte, estamos revisando tu caso...") para que los agentes las inserten rápidamente.
+
+2. Panel Administrativo en Filament (Para Agentes y Admins)
+En la carpeta app/Filament/Resources/ implementaremos:
+
+Ticket Resource:
+
+Vista de Tabla (List Tickets): Filtros rápidos por Estado, Prioridad, Categoría o Mis Tickets Asignados. Badges de colores para visualizar estados de un vistazo.
+
+Vista Personalizada del Ticket (View/Reply): Un diseño estilo hilo de conversación/chat donde el agente pueda escribir respuestas públicas o cambiar al modo Nota Interna.
+
+Acciones Rápidas (Custom Actions): Botones para "Reasignar Agente", "Marcar como Resuelto" o "Cambiar Prioridad" sin salir de la lista.
+
+Canned Responses Resource: Administración de plantillas de respuesta.
+
+Category / Department Resource: Gestión de áreas de atención.
+
+Dashboard Widgets:
+
+Métricas principales (Total de tickets abiertos, tiempo promedio de respuesta, tickets resueltos hoy).
+
+Gráfico interactivo con la tendencia de tickets creados vs. cerrados en la última semana.
+
+3. Portal de Cliente (Front-end público o simplificado)
+Un espacio para que los usuarios finales interactúen sin necesidad de acceder al panel de administración completo:
+
+Formulario para crear un ticket de soporte.
+
+Listado de sus propios tickets para dar seguimiento y responder a los agentes.
+
+(Opcional) Base de Conocimientos / FAQ: Sección de artículos para auto-resolver dudas frecuentes antes de enviar una solicitud.
+
+4. Funcionalidades Avanzadas (El valor añadido para tu CV)
+Notificaciones por Correo y Queues: Envío automático de notificaciones vía Laravel Queues (Jobs) cuando:
+
+Se crea un nuevo ticket.
+
+Un agente o cliente responde al ticket.
+
+Roles y Permisos: Control de acceso utilizando spatie/laravel-permission:
+
+Admin: Acceso total, métricas globales, gestión de usuarios y categorías.
+
+Agente: Solo gestiona y responde tickets asignados a su departamento.
+
+Cliente: Solo puede ver y responder sus propios tickets.
+
+SLA / Control de Tiempos: Alertas automáticas o banderas rojas si un ticket con prioridad Crítica pasa más de X horas sin respuesta de un agente.
+
+Exportación de Reportes: Botón para exportar listados de tickets y reportes de desempeño a PDF o Excel.*/
