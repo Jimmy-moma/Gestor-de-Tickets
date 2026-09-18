@@ -4,6 +4,7 @@ namespace App\Filament\Cliente\Resources\Tickets\Schemas;
 
 use App\Models\Categoria;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -36,6 +37,17 @@ class TicketForm
                 RichEditor::make('descripcion')
                     ->label('Descripcion detallada del problema')
                     ->required()
+                    ->columnSpanFull(),
+
+                FileUpload::make('adjuntos')
+                    ->label('Archivos Adjuntos / Capturas')
+                    ->multiple() 
+                    ->directory('ticket-attachments') 
+                    ->maxSize(5120)
+                    ->acceptedFileTypes(['image/png', 'image/jpeg', 'application/pdf', 'text/plain'])
+                    ->downloadable()
+                    ->openable()
+                    ->dehydrated(false)
                     ->columnSpanFull(),
                 Hidden::make('estatus')
                     ->default('abierto'),

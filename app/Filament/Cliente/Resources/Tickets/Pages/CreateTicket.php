@@ -17,4 +17,16 @@ class CreateTicket extends CreateRecord
         $data['numero_de_ticket'] = 'TK-' . strtoupper(Str::random(6));
         return parent::mutateFormDataBeforeCreate($data);
     }
+
+    protected function afterCreate(): void{
+        $ticket = $this->record;
+        $adjuntos = $this->data['adjuntos'] ?? [];
+
+        foreach($adjuntos as $filepath){
+            $ticket->adjuntos()->create([
+                'ruta_del_archivo' => $filepath,
+                'nombre_del_archivo' => basename($filepath)
+            ]);
+        }
+    }
 }

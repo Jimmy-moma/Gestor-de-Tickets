@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Tickets\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -35,7 +36,17 @@ class TicketForm
                             ->label('Descripcion detallada')
                             ->required()
                             ->columnSpanFull(),
-                    ])->columns(2),
+                        FileUpload::make('adjuntos')
+                            ->label('Archivos Adjuntos / Capturas')
+                            ->multiple() 
+                            ->directory('ticket-attachments') 
+                            ->maxSize(5120)
+                            ->acceptedFileTypes(['image/png', 'image/jpeg', 'application/pdf', 'text/plain'])
+                            ->downloadable()
+                            ->openable()
+                            ->dehydrated(false)
+                            ->columnSpanFull(),
+                            ])->columns(2),
 
                     Section::make('Relaciones')
                     ->schema([
