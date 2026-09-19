@@ -6,6 +6,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -36,7 +38,24 @@ class TicketsTable
                         'cerrado' => 'gray',
                         default => 'gray',
                     }),
-     
+
+                IconColumn::make('adjuntos.nombre_del_archivo')
+                    ->label('Tipo')
+                    ->icon(fn (string $state): string => match (pathinfo($state, PATHINFO_EXTENSION)) {
+                        'pdf' => 'heroicon-o-document-text',
+                        'doc', 'docx' => 'heroicon-o-document',
+                        'xls', 'xlsx' => 'heroicon-o-table-cells',
+                        'zip', 'rar' => 'heroicon-o-archive-box',
+                        'png', 'jpg', 'jpeg' => 'heroicon-o-photo',
+                        default => 'heroicon-o-paper-clip',
+                    })
+                    ->color(fn (string $state): string => match (pathinfo($state, PATHINFO_EXTENSION)) {
+                        'pdf' => 'danger',
+                        'doc', 'docx' => 'info',
+                        'xls', 'xlsx' => 'success',
+                        'zip', 'rar' => 'warning',
+                        default => 'gray',
+                    }),
                 TextColumn::make('created_at')
                     ->label('Fecha de Creacion')
                     ->dateTime('d/m/Y H:i')

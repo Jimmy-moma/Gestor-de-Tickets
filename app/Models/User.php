@@ -15,6 +15,10 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+use Override;
+use Spatie\Permission\Traits\HasRoles; 
 
 /**
  * @property int $id
@@ -31,10 +35,10 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  */
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
-class User extends Authenticatable implements PasskeyUser
+class User extends Authenticatable implements PasskeyUser, FilamentUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
+    use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable, HasRoles;
 
     /**
      * Get the attributes that should be cast.
@@ -71,5 +75,20 @@ class User extends Authenticatable implements PasskeyUser
 
     public function respuestaTickets():HasMany{
         return $this->hasMany(RespuestaTicket::class, 'user_id');
+    }
+
+    #[Override]
+    public function canAccessPanel(Panel $panel): bool
+    {
+        if($panel->getId() == 'admin'){
+            return $this->hasAnyRole(['super_admin', 'admin', 'agente', 'panel_user']);
+        }
+
+        if ($panel->getId() === 'cliente') {
+            return true;
+        }
+
+       return false;
+        //throw new \Exception('Not implemented');
     }
 }

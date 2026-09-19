@@ -50,6 +50,7 @@ class RespuestasRelationManager extends RelationManager
                     FileUpload::make('attachments')
                         ->label('Adjuntar Archivos')
                         ->multiple()
+                        ->disk('publics')
                         ->directory('reply-attachments')
                         ->maxSize(5120)
                         ->dehydrated(false)

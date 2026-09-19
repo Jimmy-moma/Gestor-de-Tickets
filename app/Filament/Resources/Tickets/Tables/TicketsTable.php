@@ -8,12 +8,14 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Support\Icons\Heroicon;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\IconColumn;
 
 class TicketsTable
 {
@@ -45,6 +47,23 @@ class TicketsTable
                     ->label('Agente')
                     ->placeholder('Sin Asignar')
                     ->sortable(),
+                IconColumn::make('adjuntos.nombre_del_archivo')
+                    ->label('Tipo')
+                    ->icon(fn (string $state): string => match (pathinfo($state, PATHINFO_EXTENSION)) {
+                        'pdf' => 'heroicon-o-document-text',
+                        'doc', 'docx' => 'heroicon-o-document',
+                        'xls', 'xlsx' => 'heroicon-o-table-cells',
+                        'zip', 'rar' => 'heroicon-o-archive-box',
+                        'png', 'jpg', 'jpeg' => 'heroicon-o-photo',
+                        default => 'heroicon-o-paper-clip',
+                    })
+                    ->color(fn (string $state): string => match (pathinfo($state, PATHINFO_EXTENSION)) {
+                        'pdf' => 'danger',
+                        'doc', 'docx' => 'info',
+                        'xls', 'xlsx' => 'success',
+                        'zip', 'rar' => 'warning',
+                        default => 'gray',
+                    }),
                 TextColumn::make('estatus')
                     ->label('Estado')
                     ->badge()

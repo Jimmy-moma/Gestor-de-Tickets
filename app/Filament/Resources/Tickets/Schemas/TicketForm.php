@@ -41,6 +41,7 @@ class TicketForm
                             ->multiple() 
                             ->directory('ticket-attachments') 
                             ->maxSize(5120)
+                            ->disk('public')
                             ->acceptedFileTypes(['image/png', 'image/jpeg', 'application/pdf', 'text/plain'])
                             ->downloadable()
                             ->openable()
